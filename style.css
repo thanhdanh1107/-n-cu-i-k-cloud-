@@ -1,85 +1,148 @@
+/* Reset định dạng mặc định */
 * {
-    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
 }
 
 body {
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+    padding: 20px;
+    color: #fff;
 }
 
+/* Khung kính mờ Glassmorphism */
 .weather-container {
-    background-color: white;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    width: 350px;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
     text-align: center;
 }
 
-h2 {
-    margin-bottom: 20px;
-    color: #333;
+.app-title {
+    font-size: 1.7rem;
+    font-weight: 600;
+    margin-bottom: 25px;
+    letter-spacing: 1px;
+    background: linear-gradient(to right, #00c6ff, #0072ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
+/* Thanh tìm kiếm */
 .search-box {
     display: flex;
     gap: 10px;
-    margin-bottom: 20px;
 }
 
-input {
+.search-box input {
     flex: 1;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    outline: none;
-}
-
-button {
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: white;
+    padding: 12px 20px;
     border: none;
-    border-radius: 5px;
+    outline: none;
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.search-box input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.search-box input:focus {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: #00c6ff;
+    box-shadow: 0 0 10px rgba(0, 198, 255, 0.2);
+}
+
+.search-box button {
+    padding: 12px 22px;
+    border: none;
+    outline: none;
+    border-radius: 30px;
+    background: linear-gradient(45deg, #00c6ff, #0072ff);
+    color: #fff;
+    font-weight: 500;
     cursor: pointer;
-    transition: 0.3s;
+    transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-button:hover {
-    background-color: #0056b3;
+.search-box button:hover { opacity: 0.9; }
+.search-box button:active { transform: scale(0.95); }
+
+/* Báo lỗi Validation */
+.error-text {
+    color: #ff4d4d;
+    font-size: 0.85rem;
+    margin-top: 8px;
+    text-align: left;
+    padding-left: 15px;
 }
 
-.weather-result {
-    margin-top: 20px;
+.hidden { display: none !important; }
+
+/* Hiệu ứng hiển thị Card thời tiết */
+.weather-card {
+    margin-top: 25px;
+    animation: fadeIn 0.5s ease-in-out forwards;
 }
 
-.temp {
-    font-size: 40px;
-    font-weight: bold;
-    color: #ff5722;
-    margin: 10px 0;
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.details {
+.location-box h3 { font-size: 1.6rem; font-weight: 500; }
+.location-box .country { font-size: 0.85rem; color: rgba(255, 255, 255, 0.6); margin-top: 2px; }
+
+.main-info {
+    margin: 15px 0;
     display: flex;
-    justify-content: space-around;
-    margin-top: 15px;
-    font-size: 14px;
-    color: #666;
+    flex-direction: column;
+    align-items: center;
 }
 
-.hidden {
-    display: none;
+.weather-icon {
+    width: 70px;
+    height: 70px;
+    filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.15));
 }
 
-.error {
-    color: red;
-    margin-top: 15px;
-    font-size: 14px;
+#temperature { font-size: 3.3rem; font-weight: 300; margin-top: 5px; }
+#description { font-size: 1.05rem; text-transform: capitalize; color: #00c6ff; margin-top: 3px; }
+
+/* Chi tiết thông số */
+.details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 25px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 20px;
 }
+
+.detail-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 12px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.detail-item .label { font-size: 0.8rem; color: rgba(255, 255, 255, 0.5); }
+.detail-item .value { font-size: 1.1rem; font-weight: 500; }
