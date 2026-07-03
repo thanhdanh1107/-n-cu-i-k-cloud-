@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tra cứu Thời tiết</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="weather-container">
+        <h2>Dự báo thời tiết</h2>
+        <div class="search-box">
+            <input type="text" id="cityInput" placeholder="Nhập tên thành phố (vd: Hanoi, Ho Chi Minh)...">
+            <button onclick="getWeather()">Tìm kiếm</button>
+        </div>
+
+        <div id="weatherResult" class="weather-result hidden">
+            <h3 id="cityName">Thành phố</h3>
+            <p id="temperature" class="temp">--°C</p>
+            <p id="description">Mô tả thời tiết</p>
+            <div class="details">
+                <p>Độ ẩm: <span id="humidity">--%</span></p>
+                <p>Sức gió: <span id="wind">-- km/h</span></p>
+            </div>
+        </div>
+
+        <p id="errorMessage" class="error hidden">Không tìm thấy thành phố này. Vui lòng thử lại!</p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
