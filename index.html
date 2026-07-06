@@ -8,12 +8,36 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div class="user-panel">
+        <div id="loggedOutView">
+            <button id="showAuthBtn" class="auth-btn">Đăng nhập / Đăng ký</button>
+        </div>
+        <div id="loggedInView" class="hidden">
+            <span>Xin chào, <b id="userEmailDisplay"></b></span>
+            <button id="logoutBtn" class="auth-btn outline">Đăng xuất</button>
+        </div>
+    </div>
+
+    <div id="authModal" class="modal hidden">
+        <div class="modal-content">
+            <span id="closeModal" class="close-btn">&times;</span>
+            <h3 id="authTitle">Đăng Nhập</h3>
+            <input type="email" id="emailInput" placeholder="Email của bạn">
+            <input type="password" id="passwordInput" placeholder="Mật khẩu (ít nhất 6 ký tự)">
+            <p id="authError" class="error-text hidden"></p>
+            <button id="submitAuthBtn" class="primary-btn">Đăng Nhập</button>
+            <p class="switch-mode">
+                <span id="authSwitchText">Chưa có tài khoản?</span> 
+                <a href="#" id="switchAuthMode">Đăng ký ngay</a>
+            </p>
+        </div>
+    </div>
+
     <div class="weather-container">
         <h2 class="app-title">Dự Báo Thời Tiết</h2>
-        
         <div class="search-box">
-            <input type="text" id="cityInput" placeholder="Nhập tên thành phố (vd: Hanoi, Tokyo...)" autocomplete="off">
-            <button id="searchBtn" onclick="getWeather()">Tìm kiếm</button>
+            <input type="text" id="cityInput" placeholder="Nhập tên thành phố (vd: Hanoi...)" autocomplete="off">
+            <button id="searchBtn">Tìm kiếm</button>
         </div>
         
         <p id="validationMessage" class="error-text hidden">Vui lòng nhập tên thành phố hợp lệ!</p>
@@ -24,26 +48,23 @@
                 <h3 id="cityName">--</h3>
                 <p id="countryName" class="country">--</p>
             </div>
-            
             <div class="main-info">
                 <img id="weatherIcon" src="" alt="Thời tiết" class="weather-icon hidden">
                 <h1 id="temperature">--°C</h1>
                 <p id="description">--</p>
             </div>
-
             <div class="details-grid">
                 <div class="detail-item">
-                    <span class="label">Độ ẩm</span>
-                    <span id="humidity" class="value">--%</span>
+                    <span class="label">Độ ẩm</span><span id="humidity" class="value">--%</span>
                 </div>
                 <div class="detail-item">
-                    <span class="label">Sức gió</span>
-                    <span id="wind" class="value">-- km/h</span>
+                    <span class="label">Sức gió</span><span id="wind" class="value">-- km/h</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
