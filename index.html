@@ -10,7 +10,7 @@
 <body>
 
     <div class="user-panel">
-        <div id="loggedOutView">
+        <div id="loggedOutView" class="hidden">
             <button id="showAuthBtn" class="auth-btn">Đăng nhập / Đăng ký</button>
         </div>
         <div id="loggedInView" class="hidden">
@@ -19,9 +19,8 @@
         </div>
     </div>
 
-    <div id="authModal" class="modal hidden">
+    <div id="authModal" class="modal">
         <div class="modal-content">
-            <span id="closeModal" class="close-btn">&times;</span>
             <h3 id="authTitle">Đăng Nhập</h3>
             <input type="email" id="emailInput" placeholder="Email của bạn">
             <input type="password" id="passwordInput" placeholder="Mật khẩu (tối thiểu 6 ký tự)">
@@ -34,7 +33,7 @@
         </div>
     </div>
 
-    <div class="weather-container">
+    <div id="mainApp" class="weather-container hidden">
         <h2 class="app-title">Dự Báo Thời Tiết</h2>
         
         <div class="search-box">

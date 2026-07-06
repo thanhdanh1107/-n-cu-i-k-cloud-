@@ -11,15 +11,12 @@ let isLoginMode = true;
 let currentUser = null; 
 let currentCityFetched = ""; 
 
-// --- 1. ĐĂNG NHẬP / ĐĂNG KÝ (GIAO DIỆN MODAL) ---
+// --- 1. XỬ LÝ AUTH INTERFACE (ĐĂNG NHẬP / ĐĂNG KÝ) ---
 const authModal = document.getElementById('authModal');
 const authError = document.getElementById('authError');
+const mainApp = document.getElementById('mainApp'); // Trỏ tới app thời tiết
 
-document.getElementById('showAuthBtn').addEventListener('click', () => authModal.classList.remove('hidden'));
-document.getElementById('closeModal').addEventListener('click', () => {
-    authModal.classList.add('hidden'); authError.classList.add('hidden');
-});
-
+// Xử lý chuyển đổi giữa Đăng nhập và Đăng ký
 document.getElementById('switchAuthMode').addEventListener('click', (e) => {
     e.preventDefault();
     isLoginMode = !isLoginMode;
@@ -30,6 +27,7 @@ document.getElementById('switchAuthMode').addEventListener('click', (e) => {
     authError.classList.add('hidden');
 });
 
+// Xử lý nút Submit
 document.getElementById('submitAuthBtn').addEventListener('click', async () => {
     const email = document.getElementById('emailInput').value.trim();
     const password = document.getElementById('passwordInput').value;
@@ -39,37 +37,52 @@ document.getElementById('submitAuthBtn').addEventListener('click', async () => {
     try {
         if (isLoginMode) { await signInWithEmailAndPassword(auth, email, password); } 
         else { await createUserWithEmailAndPassword(auth, email, password); }
-        authModal.classList.add('hidden'); authError.classList.add('hidden');
+        authError.classList.add('hidden');
     } catch (error) {
         authError.innerText = "Lỗi: " + error.message; authError.classList.remove('hidden');
     }
 });
 
+// Nút Đăng xuất
 document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
-// Theo dõi liên tục trạng thái Đăng nhập / Đăng xuất của User
+// --- BỘ ĐIỀU KHIỂN TRUNG TÂM ---
+// Kiểm tra trạng thái User liên tục để quyết định màn hình nào được hiện ra
 onAuthStateChanged(auth, (user) => {
     const userDataSection = document.getElementById('userDataSection');
+    
     if (user) {
+        // NẾU ĐÃ ĐĂNG NHẬP THÀNH CÔNG:
         currentUser = user;
+        authModal.classList.add('hidden');    // Giấu bảng đăng nhập
+        mainApp.classList.remove('hidden');   // HIỆN APP THỜI TIẾT
+        
         document.getElementById('loggedOutView').classList.add('hidden');
         document.getElementById('loggedInView').classList.remove('hidden');
         document.getElementById('userEmailDisplay').innerText = user.email;
         userDataSection.classList.remove('hidden');
+        
+        // Tải dữ liệu cá nhân
         loadSearchHistory();
         loadFavorites();
     } else {
+        // NẾU CHƯA ĐĂNG NHẬP / VỪA ĐĂNG XUẤT:
         currentUser = null;
+        authModal.classList.remove('hidden'); // HIỆN BẢNG ĐĂNG NHẬP LÊN ĐẦU
+        mainApp.classList.add('hidden');      // Giấu app thời tiết đi
+        
         document.getElementById('loggedOutView').classList.remove('hidden');
         document.getElementById('loggedInView').classList.add('hidden');
         userDataSection.classList.add('hidden');
         document.getElementById('favBtn').innerText = "☆";
+        
+        // Reset lại form đăng nhập
+        document.getElementById('emailInput').value = "";
+        document.getElementById('passwordInput').value = "";
     }
 });
 
-// --- 2. LOGIC LƯU TRỮ VÀ XỬ LÝ DATABASE (FIRESTORE) ---
-
-// Lưu lịch sử tra cứu của user
+// --- 2. XỬ LÝ DATABASE CHUYÊN SÂU ---
 async function saveToHistory(cityName) {
     if (!currentUser) return;
     try {
@@ -82,7 +95,6 @@ async function saveToHistory(cityName) {
     } catch (e) { console.error("Lỗi lưu lịch sử: ", e); }
 }
 
-// Tải lịch sử tra cứu (Hiện tối đa 5 địa điểm mới nhất, lọc trùng)
 async function loadSearchHistory() {
     if (!currentUser) return;
     const historyList = document.getElementById('historyList');
@@ -93,19 +105,15 @@ async function loadSearchHistory() {
         let docsData = [];
         querySnapshot.forEach(doc => docsData.push(doc.data()));
         
-        // Sắp xếp thời gian client-side tránh lỗi cài đặt index của Firebase
         docsData.sort((a, b) => {
             const timeA = a.timestamp?.seconds || Date.now() / 1000;
             const timeB = b.timestamp?.seconds || Date.now() / 1000;
             return timeB - timeA;
         });
         
-        // Chỉ lấy tối đa 5 thành phố duy nhất, không trùng tên sát nhau
         let uniqueCities = [];
         for (let doc of docsData) {
-            if (!uniqueCities.includes(doc.cityName)) {
-                uniqueCities.push(doc.cityName);
-            }
+            if (!uniqueCities.includes(doc.cityName)) uniqueCities.push(doc.cityName);
             if (uniqueCities.length >= 5) break;
         }
 
@@ -118,12 +126,11 @@ async function loadSearchHistory() {
             });
             historyList.appendChild(li);
         });
-    } catch (e) { console.error("Lỗi lấy lịch sử: ", e); }
+    } catch (e) { console.error("Lỗi tải lịch sử: ", e); }
 }
 
-// Nhấn nút Trái tim (Thêm / Xóa khỏi danh sách yêu thích)
 document.getElementById('favBtn').addEventListener('click', async () => {
-    if (!currentUser) { alert("Vui lòng đăng nhập để sử dụng tính năng Yêu thích!"); return; }
+    if (!currentUser) return;
     if (!currentCityFetched) return;
 
     try {
@@ -132,13 +139,11 @@ document.getElementById('favBtn').addEventListener('click', async () => {
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
-            // Đã tồn tại -> Tiến hành Hủy thích (Xóa khỏi Firestore)
             querySnapshot.forEach(async (documentRecord) => {
                 await deleteDoc(doc(db, "favorites", documentRecord.id));
             });
             document.getElementById('favBtn').innerText = "☆";
         } else {
-            // Chưa tồn tại -> Tiến hành Thêm thích (Ghi vào Firestore)
             await addDoc(favRef, {
                 userId: currentUser.uid,
                 cityName: currentCityFetched,
@@ -150,7 +155,6 @@ document.getElementById('favBtn').addEventListener('click', async () => {
     } catch (e) { console.error("Lỗi xử lý yêu thích: ", e); }
 });
 
-// Tải và hiển thị danh sách Yêu thích
 async function loadFavorites() {
     if (!currentUser) return;
     const favoritesList = document.getElementById('favoritesList');
@@ -168,12 +172,10 @@ async function loadFavorites() {
             const li = document.createElement('li');
             li.innerHTML = `<span>${data.cityName}</span> <span class="delete-item-btn">&times;</span>`;
             
-            // Bấm vào chữ để tra cứu nhanh
             li.querySelector('span').addEventListener('click', () => {
                 document.getElementById('cityInput').value = data.cityName;
                 getWeather();
             });
-            // Bấm vào dấu x để xóa khỏi danh sách
             li.querySelector('.delete-item-btn').addEventListener('click', async (e) => {
                 e.stopPropagation();
                 await deleteDoc(doc(db, "favorites", documentRecord.id));
@@ -185,10 +187,10 @@ async function loadFavorites() {
         });
 
         document.getElementById('favBtn').innerText = isCurrentCityFav ? "❤" : "☆";
-    } catch (e) { console.error("Lỗi lấy danh sách yêu thích: ", e); }
+    } catch (e) { console.error("Lỗi tải danh sách yêu thích: ", e); }
 }
 
-// --- 3. LOGIC GỌI API THỜI TIẾT ---
+// --- 3. ĐỊNH TUYẾN API THỜI TIẾT ---
 async function getWeather() {
     const cityInput = document.getElementById('cityInput');
     const weatherResult = document.getElementById('weatherResult');
@@ -219,7 +221,7 @@ async function getWeather() {
 
         if (response.ok) {
             weatherResult.classList.remove('hidden');
-            currentCityFetched = data.location.name; // Lưu lại tên chuẩn của API
+            currentCityFetched = data.location.name;
 
             document.getElementById('cityName').innerText = data.location.name;
             document.getElementById('countryName').innerText = `${data.location.region ? data.location.region + ', ' : ''}${data.location.country}`;
@@ -232,14 +234,13 @@ async function getWeather() {
             weatherIcon.src = "https:" + data.current.condition.icon;
             weatherIcon.classList.remove('hidden');
 
-            // Kích hoạt ghi lịch sử và kiểm tra đồng bộ yêu thích
             saveToHistory(data.location.name);
-            if (currentUser) loadFavorites(); 
+            loadFavorites(); 
         } else {
             weatherResult.classList.add('hidden'); errorMessage.classList.remove('hidden');
         }
     } catch (error) {
-        console.error("Lỗi kết nối: ", error);
+        console.error("Lỗi: ", error);
         alert("Đã xảy ra lỗi kết nối với máy chủ thời tiết.");
     }
 }
