@@ -1,4 +1,4 @@
-/* --- RESET & STYLE CHUNG --- */
+/* --- ĐỊNH DẠNG CHUNG --- */
 * {
     margin: 0; padding: 0; box-sizing: border-box;
     font-family: 'Poppins', sans-serif;
@@ -8,6 +8,7 @@ body {
     background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
     min-height: 100vh;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     padding: 20px;
@@ -15,7 +16,20 @@ body {
     position: relative;
 }
 
-/* --- KHUNG KÍNH MỜ CHÍNH --- */
+/* --- THANH TÀI KHOẢN GÓC TRÊN --- */
+.user-panel {
+    position: absolute; top: 20px; right: 20px;
+    background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
+    padding: 10px 20px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.2);
+    z-index: 10;
+}
+.auth-btn {
+    background: linear-gradient(45deg, #00c6ff, #0072ff); color: white;
+    border: none; padding: 8px 15px; border-radius: 15px; cursor: pointer; font-size: 0.9rem;
+}
+.auth-btn.outline { background: transparent; border: 1px solid #ff4d4d; color: #ff4d4d; margin-left: 10px; }
+
+/* --- KHUNG ỨNG DỤNG KÍNH MỜ --- */
 .weather-container {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
@@ -55,20 +69,15 @@ body {
 }
 .search-box button:active { transform: scale(0.95); }
 
-/* --- THÀNH PHỐ & NÚT THẢ TIM --- */
-.title-wrapper {
-    display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 10px;
-}
-.fav-btn {
-    background: none; border: none; color: #ffdb58; font-size: 1.8rem;
-    cursor: pointer; transition: transform 0.2s; outline: none;
-}
+/* --- TIÊU ĐỀ KẾT QUẢ & NÚT TRÁI TIM --- */
+.title-wrapper { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 10px; }
+.fav-btn { background: none; border: none; color: #ffdb58; font-size: 1.8rem; cursor: pointer; transition: transform 0.2s; outline: none; }
 .fav-btn:hover { transform: scale(1.2); }
 
-.error-text { color: #ff4d4d; font-size: 0.85rem; margin-top: 8px; text-align: left; padding-left: 15px; }
+.error-text { color: #ff4d4d; font-size: 0.85rem; margin-top: 10px; text-align: center; }
 .hidden { display: none !important; }
 
-/* --- CARD KẾT QUẢ THỜI TIẾT --- */
+/* --- CARD THỜI TIẾT --- */
 .weather-card { margin-top: 25px; animation: fadeIn 0.5s ease forwards; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 .location-box h3 { font-size: 1.6rem; font-weight: 500; }
@@ -77,6 +86,7 @@ body {
 .weather-icon { width: 70px; height: 70px; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.15)); }
 #temperature { font-size: 3.3rem; font-weight: 300; }
 #description { font-size: 1.05rem; text-transform: capitalize; color: #00c6ff; }
+
 .details-grid {
     display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px;
     border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 20px;
@@ -85,18 +95,7 @@ body {
 .detail-item .label { font-size: 0.8rem; color: rgba(255, 255, 255, 0.5); }
 .detail-item .value { font-size: 1.1rem; font-weight: 500; }
 
-/* --- ĐĂNG NHẬP & MODAL --- */
-.user-panel {
-    position: absolute; top: 20px; right: 20px;
-    background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
-    padding: 10px 20px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.2);
-    z-index: 10;
-}
-.auth-btn {
-    background: linear-gradient(45deg, #00c6ff, #0072ff); color: white;
-    border: none; padding: 8px 15px; border-radius: 15px; cursor: pointer; font-size: 0.9rem;
-}
-.auth-btn.outline { background: transparent; border: 1px solid #ff4d4d; color: #ff4d4d; margin-left: 10px; }
+/* --- CỬA SỔ ĐĂNG NHẬP NỔI (MODAL) --- */
 .modal {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1000;
@@ -130,9 +129,9 @@ body {
     display: flex; justify-content: space-between; align-items: center;
 }
 .data-list li:hover { background: rgba(255,255,255,0.15); }
-.delete-item-btn { color: #ff4d4d; font-weight: bold; padding: 0 5px; cursor: pointer; }
+.delete-item-btn { color: #ff4d4d; font-weight: bold; padding: 0 5px; cursor: pointer; font-size: 1.1rem; }
 
-/* --- ĐÁP ỨNG DI ĐỘNG (RESPONSIVE) --- */
+/* --- RESPONSIVE CHO DI ĐỘNG --- */
 @media screen and (max-width: 520px) {
     .user-panel { position: static; margin-bottom: 10px; width: 100%; text-align: center; }
     .weather-container { margin-top: 10px; width: 100%; padding: 20px; }
