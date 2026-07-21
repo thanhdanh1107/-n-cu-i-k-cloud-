@@ -84,7 +84,6 @@ function initializeMap() {
         showErrorMessage(
             "Không thể tải thư viện bản đồ. Vui lòng kiểm tra kết nối mạng."
         );
-
         return;
     }
 
@@ -108,11 +107,9 @@ function initializeMap() {
         }
     ).addTo(weatherMap);
 
-    L.control
-        .zoom({
-            position: "bottomright"
-        })
-        .addTo(weatherMap);
+    L.control.zoom({
+        position: "bottomright"
+    }).addTo(weatherMap);
 
     window.setTimeout(() => {
         weatherMap.invalidateSize();
@@ -167,10 +164,7 @@ function resetMapView() {
 }
 
 
-function updateMapLocation(
-    location,
-    currentWeather
-) {
+function updateMapLocation(location, currentWeather) {
     if (!weatherMap) {
         return;
     }
@@ -186,10 +180,7 @@ function updateMapLocation(
     }
 
     weatherMap.setView(
-        [
-            latitude,
-            longitude
-        ],
+        [latitude, longitude],
         9,
         {
             animate: true
@@ -213,9 +204,7 @@ function updateMapLocation(
             <strong>${escapeHtml(location.name)}</strong><br>
             ${escapeHtml(location.country || "")}<br>
             ${Math.round(currentWeather.temp_c)}°C -
-            ${escapeHtml(
-                currentWeather.condition?.text || ""
-            )}
+            ${escapeHtml(currentWeather.condition?.text || "")}
         `)
         .openPopup();
 
@@ -226,12 +215,14 @@ function updateMapLocation(
 
 
 /* =========================================================
-   7. TÌM KIẾM THỜI TIẾT
+   7. KIỂM TRA DỮ LIỆU TÌM KIẾM
    ========================================================= */
 
 async function searchWeatherByInput() {
     const cityInput = getElement("cityInput");
     const city = cityInput.value.trim();
+
+    hideMessages();
 
     if (!city) {
         showValidationMessage(
@@ -247,6 +238,31 @@ async function searchWeatherByInput() {
             "Tên thành phố quá dài. Vui lòng kiểm tra lại."
         );
 
+        cityInput.focus();
+        return;
+    }
+
+    /*
+        Cho phép:
+        - Chữ tiếng Việt
+        - Chữ tiếng Anh
+        - Khoảng trắng
+        - Dấu gạch ngang
+        - Dấu nháy đơn
+
+        Không cho phép:
+        - Số
+        - Các ký tự đặc biệt như @, #, $, %, *, ...
+    */
+    const cityNameRegex =
+        /^[A-Za-zÀ-ỹĐđ\s'-]+$/u;
+
+    if (!cityNameRegex.test(city)) {
+        showValidationMessage(
+            "Tên thành phố không được chứa số hoặc ký tự đặc biệt."
+        );
+
+        cityInput.focus();
         return;
     }
 
@@ -526,9 +542,7 @@ function renderCurrentWeather(
 
     setText(
         "feelsLike",
-        `${Math.round(
-            current.feelslike_c
-        )}°C`
+        `${Math.round(current.feelslike_c)}°C`
     );
 
     setText(
@@ -538,33 +552,22 @@ function renderCurrentWeather(
 
     setText(
         "wind",
-        `${formatNumber(
-            current.wind_kph,
-            1
-        )} km/h`
+        `${formatNumber(current.wind_kph, 1)} km/h`
     );
 
     setText(
         "pressure",
-        `${Math.round(
-            current.pressure_mb
-        )} hPa`
+        `${Math.round(current.pressure_mb)} hPa`
     );
 
     setText(
         "visibility",
-        `${formatNumber(
-            current.vis_km,
-            1
-        )} km`
+        `${formatNumber(current.vis_km, 1)} km`
     );
 
     setText(
         "uvIndex",
-        formatNumber(
-            current.uv,
-            1
-        )
+        formatNumber(current.uv, 1)
     );
 
     setText(
@@ -574,10 +577,7 @@ function renderCurrentWeather(
 
     setText(
         "precipitation",
-        `${formatNumber(
-            current.precip_mm,
-            1
-        )} mm`
+        `${formatNumber(current.precip_mm, 1)} mm`
     );
 
     setText(
@@ -587,9 +587,7 @@ function renderCurrentWeather(
 
     setText(
         "windDegree",
-        Number.isFinite(
-            Number(current.wind_degree)
-        )
+        Number.isFinite(Number(current.wind_degree))
             ? `${current.wind_degree}°`
             : "--°"
     );
@@ -666,34 +664,24 @@ function renderHourlyForecast(
         );
 
     const currentEpoch =
-        Number(
-            location.localtime_epoch
-        ) ||
-        Math.floor(
-            Date.now() / 1000
-        );
+        Number(location.localtime_epoch) ||
+        Math.floor(Date.now() / 1000);
 
     let upcomingHours =
         allHours
             .filter(
                 (hour) =>
-                    Number(
-                        hour.time_epoch
-                    ) >=
+                    Number(hour.time_epoch) >=
                     currentEpoch - 1800
             )
             .slice(0, 24);
 
-    if (
-        upcomingHours.length === 0
-    ) {
+    if (upcomingHours.length === 0) {
         upcomingHours =
             allHours.slice(0, 24);
     }
 
-    if (
-        upcomingHours.length === 0
-    ) {
+    if (upcomingHours.length === 0) {
         hourlyContainer.innerHTML = `
             <div class="forecast-placeholder">
                 Không có dữ liệu dự báo theo giờ.
@@ -737,33 +725,23 @@ function renderHourlyForecast(
                     ${
                         index === 0
                             ? "Bây giờ"
-                            : escapeHtml(
-                                timeText
-                            )
+                            : escapeHtml(timeText)
                     }
                 </span>
 
                 <img
                     class="hourly-icon"
-                    src="${escapeHtml(
-                        iconUrl
-                    )}"
-                    alt="${escapeHtml(
-                        conditionText
-                    )}"
+                    src="${escapeHtml(iconUrl)}"
+                    alt="${escapeHtml(conditionText)}"
                     loading="lazy"
                 >
 
                 <strong class="hourly-temperature">
-                    ${Math.round(
-                        hour.temp_c
-                    )}°
+                    ${Math.round(hour.temp_c)}°
                 </strong>
 
                 <span class="hourly-condition">
-                    ${escapeHtml(
-                        conditionText
-                    )}
+                    ${escapeHtml(conditionText)}
                 </span>
 
                 <span class="hourly-rain">
@@ -838,22 +816,16 @@ function renderDailyForecast(
 
             card.innerHTML = `
                 <strong class="daily-day">
-                    ${escapeHtml(
-                        dayName
-                    )}
+                    ${escapeHtml(dayName)}
                 </strong>
 
                 <span class="daily-date">
-                    ${escapeHtml(
-                        dateText
-                    )}
+                    ${escapeHtml(dateText)}
                 </span>
 
                 <img
                     class="daily-icon"
-                    src="${escapeHtml(
-                        iconUrl
-                    )}"
+                    src="${escapeHtml(iconUrl)}"
                     alt="${escapeHtml(
                         condition.text || ""
                     )}"
@@ -862,8 +834,7 @@ function renderDailyForecast(
 
                 <span class="daily-condition">
                     ${escapeHtml(
-                        condition.text ||
-                        "--"
+                        condition.text || "--"
                     )}
                 </span>
 
@@ -883,8 +854,7 @@ function renderDailyForecast(
 
                 <span class="daily-rain">
                     💧 ${
-                        dayData
-                            .daily_chance_of_rain
+                        dayData.daily_chance_of_rain
                         ?? 0
                     }%
                 </span>
@@ -1006,16 +976,8 @@ function resetAirQualityDisplay() {
 
     setText("pm25", "--");
     setText("pm10", "--");
-
-    setText(
-        "carbonMonoxide",
-        "--"
-    );
-
-    setText(
-        "nitrogenDioxide",
-        "--"
-    );
+    setText("carbonMonoxide", "--");
+    setText("nitrogenDioxide", "--");
 }
 
 
@@ -1025,26 +987,20 @@ function getAirQualityStatus(
     const levels = {
         1: {
             title: "Tốt",
-
             description:
                 "Chất lượng không khí tốt và ít gây ảnh hưởng đến sức khỏe.",
-
             color:
                 "rgba(34, 197, 94, 0.65)",
-
             background:
                 "rgba(34, 197, 94, 0.28)"
         },
 
         2: {
             title: "Trung bình",
-
             description:
                 "Chất lượng không khí ở mức chấp nhận được.",
-
             color:
                 "rgba(234, 179, 8, 0.65)",
-
             background:
                 "rgba(234, 179, 8, 0.25)"
         },
@@ -1052,13 +1008,10 @@ function getAirQualityStatus(
         3: {
             title:
                 "Không tốt cho nhóm nhạy cảm",
-
             description:
                 "Trẻ em, người lớn tuổi và người có bệnh hô hấp nên hạn chế hoạt động ngoài trời.",
-
             color:
                 "rgba(249, 115, 22, 0.7)",
-
             background:
                 "rgba(249, 115, 22, 0.26)"
         },
@@ -1066,13 +1019,10 @@ function getAirQualityStatus(
         4: {
             title:
                 "Không tốt",
-
             description:
                 "Mọi người nên hạn chế hoạt động kéo dài ngoài trời.",
-
             color:
                 "rgba(239, 68, 68, 0.7)",
-
             background:
                 "rgba(239, 68, 68, 0.26)"
         },
@@ -1080,13 +1030,10 @@ function getAirQualityStatus(
         5: {
             title:
                 "Rất không tốt",
-
             description:
                 "Nên giảm tối đa các hoạt động ngoài trời.",
-
             color:
                 "rgba(168, 85, 247, 0.7)",
-
             background:
                 "rgba(168, 85, 247, 0.25)"
         },
@@ -1094,13 +1041,10 @@ function getAirQualityStatus(
         6: {
             title:
                 "Nguy hại",
-
             description:
                 "Chất lượng không khí nguy hại. Nên ở trong nhà và hạn chế tiếp xúc.",
-
             color:
                 "rgba(127, 29, 29, 0.85)",
-
             background:
                 "rgba(127, 29, 29, 0.38)"
         }
@@ -1110,13 +1054,10 @@ function getAirQualityStatus(
         levels[index] || {
             title:
                 "Chưa xác định",
-
             description:
                 "Không có đủ dữ liệu để đánh giá chất lượng không khí.",
-
             color:
                 "rgba(56, 189, 248, 0.4)",
-
             background:
                 "rgba(56, 189, 248, 0.15)"
         }
@@ -1152,12 +1093,10 @@ function searchWeatherByCurrentLocation() {
         .getCurrentPosition(
             async (position) => {
                 const latitude =
-                    position.coords
-                        .latitude;
+                    position.coords.latitude;
 
                 const longitude =
-                    position.coords
-                        .longitude;
+                    position.coords.longitude;
 
                 await getWeather(
                     `${latitude},${longitude}`
@@ -1723,9 +1662,7 @@ async function loadSearchHistory() {
 
                 item.innerHTML = `
                     <span>
-                        ${escapeHtml(
-                            displayName
-                        )}
+                        ${escapeHtml(displayName)}
                     </span>
 
                     <span aria-hidden="true">
@@ -2311,7 +2248,6 @@ function bindInterfaceEvents() {
                             "Enter"
                         ) {
                             event.preventDefault();
-
                             submitAuthentication();
                         }
                     }
@@ -2340,8 +2276,7 @@ function bindInterfaceEvents() {
         () => {
             window.setTimeout(
                 () =>
-                    weatherMap
-                        ?.invalidateSize(),
+                    weatherMap?.invalidateSize(),
                 100
             );
         }
