@@ -1,139 +1,2052 @@
-/* --- ĐỊNH DẠNG CHUNG --- */
+/* =========================================================
+   SKYWEATHER - GIAO DIỆN WEBSITE THỜI TIẾT RESPONSIVE
+   ========================================================= */
+
+/* ==================== BIẾN MÀU SẮC ==================== */
+:root {
+    --background-dark: #06111f;
+    --background-medium: #0a1c31;
+    --background-light: #12375b;
+
+    --card-background: rgba(8, 32, 57, 0.84);
+    --card-background-light: rgba(20, 58, 91, 0.72);
+    --card-background-hover: rgba(31, 76, 113, 0.82);
+
+    --border-color: rgba(180, 220, 255, 0.16);
+    --border-color-strong: rgba(180, 220, 255, 0.28);
+
+    --primary-color: #38bdf8;
+    --primary-dark: #0284c7;
+    --secondary-color: #60a5fa;
+    --accent-color: #fbbf24;
+
+    --text-primary: #f8fbff;
+    --text-secondary: #b7c9dc;
+    --text-muted: #7f9ab2;
+
+    --success-color: #22c55e;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+
+    --shadow-small: 0 8px 20px rgba(0, 0, 0, 0.2);
+    --shadow-medium: 0 20px 50px rgba(0, 0, 0, 0.32);
+    --shadow-large: 0 30px 80px rgba(0, 0, 0, 0.4);
+
+    --border-radius-small: 12px;
+    --border-radius-medium: 18px;
+    --border-radius-large: 26px;
+
+    --header-height: 86px;
+    --page-max-width: 1540px;
+}
+
+
+/* ==================== RESET CSS ==================== */
 * {
-    margin: 0; padding: 0; box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 body {
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    min-width: 320px;
     min-height: 100vh;
+    overflow-x: hidden;
+    color: var(--text-primary);
+    background:
+        radial-gradient(circle at top left, rgba(14, 165, 233, 0.18), transparent 30%),
+        radial-gradient(circle at top right, rgba(37, 99, 235, 0.18), transparent 32%),
+        linear-gradient(145deg, var(--background-dark), var(--background-medium));
+    font-family: "Inter", sans-serif;
+    line-height: 1.5;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+button {
+    border: none;
+}
+
+button,
+a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+input:focus-visible,
+a:focus-visible {
+    outline: 3px solid rgba(56, 189, 248, 0.45);
+    outline-offset: 3px;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+ul {
+    list-style: none;
+}
+
+.hidden {
+    display: none !important;
+}
+
+
+/* ==================== THANH CUỘN ==================== */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(96, 165, 250, 0.38);
+    border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(96, 165, 250, 0.62);
+}
+
+
+/* ==================== NỀN TRANG ==================== */
+.page-background {
+    position: fixed;
+    inset: 0;
+    z-index: -10;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.background-glow {
+    position: absolute;
+    width: 520px;
+    height: 520px;
+    border-radius: 50%;
+    filter: blur(110px);
+    opacity: 0.25;
+}
+
+.glow-one {
+    top: -160px;
+    left: -170px;
+    background: #0ea5e9;
+}
+
+.glow-two {
+    right: -180px;
+    bottom: -190px;
+    background: #2563eb;
+}
+
+.background-grid {
+    position: absolute;
+    inset: 0;
+    opacity: 0.06;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.6) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.6) 1px, transparent 1px);
+    background-size: 42px 42px;
+    mask-image: linear-gradient(to bottom, black, transparent 88%);
+}
+
+
+/* ==================== HEADER ==================== */
+.top-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    width: 100%;
+    min-height: var(--header-height);
+
+    display: grid;
+    grid-template-columns: auto minmax(280px, 700px) auto;
+    align-items: center;
+    gap: 24px;
+
+    padding: 14px max(24px, calc((100vw - var(--page-max-width)) / 2));
+
+    background: rgba(4, 18, 32, 0.78);
+    border-bottom: 1px solid var(--border-color);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    box-shadow: 0 8px 35px rgba(0, 0, 0, 0.22);
+}
+
+.brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-width: max-content;
+}
+
+.brand-icon {
+    width: 46px;
+    height: 46px;
+
+    display: grid;
+    place-items: center;
+
+    color: #ffffff;
+    background: linear-gradient(145deg, var(--primary-color), #2563eb);
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    border-radius: 15px;
+
+    font-size: 1.55rem;
+    box-shadow: 0 10px 30px rgba(14, 165, 233, 0.34);
+}
+
+.brand-text {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    color: #fff;
-    position: relative;
 }
 
-/* --- THANH TÀI KHOẢN GÓC TRÊN --- */
-.user-panel {
-    position: absolute; top: 20px; right: 20px;
-    background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
-    padding: 10px 20px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.2);
-    z-index: 10;
+.brand-text strong {
+    font-size: 1.08rem;
+    letter-spacing: 0.2px;
 }
-.auth-btn {
-    background: linear-gradient(45deg, #00c6ff, #0072ff); color: white;
-    border: none; padding: 8px 15px; border-radius: 15px; cursor: pointer; font-size: 0.9rem;
-}
-.auth-btn.outline { background: transparent; border: 1px solid #ff4d4d; color: #ff4d4d; margin-left: 10px; }
 
-/* --- KHUNG ỨNG DỤNG KÍNH MỜ --- */
-.weather-container {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 30px;
-    border-radius: 20px;
+.brand-text small {
+    color: var(--text-muted);
+    font-size: 0.72rem;
+}
+
+
+/* ==================== THANH TÌM KIẾM ==================== */
+.header-search {
     width: 100%;
-    max-width: 450px;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-    text-align: center;
-    margin-top: 60px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.app-title {
-    font-size: 1.7rem; font-weight: 600; margin-bottom: 25px; letter-spacing: 1px;
-    background: linear-gradient(to right, #00c6ff, #0072ff);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+.search-box {
+    flex: 1;
+    min-width: 0;
+    height: 52px;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding-left: 16px;
+
+    background: rgba(255, 255, 255, 0.075);
+    border: 1px solid var(--border-color);
+    border-radius: 17px;
+
+    transition:
+        border-color 0.25s ease,
+        background 0.25s ease,
+        box-shadow 0.25s ease;
 }
 
-/* --- THANH TÌM KIẾM --- */
-.search-box { display: flex; gap: 10px; }
+.search-box:focus-within {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(56, 189, 248, 0.65);
+    box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.1);
+}
+
+.search-icon {
+    color: var(--text-muted);
+    font-size: 1.55rem;
+    transform: rotate(-15deg);
+}
+
 .search-box input {
-    flex: 1; padding: 12px 20px; border: none; outline: none; border-radius: 30px;
-    background: rgba(255, 255, 255, 0.15); color: #fff; font-size: 0.95rem;
-    transition: all 0.3s ease; border: 1px solid transparent;
-}
-.search-box input::placeholder { color: rgba(255, 255, 255, 0.6); }
-.search-box input:focus {
-    background: rgba(255, 255, 255, 0.25); border-color: #00c6ff;
-    box-shadow: 0 0 10px rgba(0, 198, 255, 0.2);
-}
-.search-box button {
-    padding: 12px 22px; border: none; outline: none; border-radius: 30px;
-    background: linear-gradient(45deg, #00c6ff, #0072ff); color: #fff;
-    font-weight: 500; cursor: pointer; transition: transform 0.2s;
-}
-.search-box button:active { transform: scale(0.95); }
+    flex: 1;
+    min-width: 0;
 
-/* --- TIÊU ĐỀ KẾT QUẢ & NÚT TRÁI TIM --- */
-.title-wrapper { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 10px; }
-.fav-btn { background: none; border: none; color: #ffdb58; font-size: 1.8rem; cursor: pointer; transition: transform 0.2s; outline: none; }
-.fav-btn:hover { transform: scale(1.2); }
+    color: var(--text-primary);
+    background: transparent;
+    border: none;
+    outline: none;
 
-.error-text { color: #ff4d4d; font-size: 0.85rem; margin-top: 10px; text-align: center; }
-.hidden { display: none !important; }
+    font-size: 0.96rem;
+}
 
-/* --- CARD THỜI TIẾT --- */
-.weather-card { margin-top: 25px; animation: fadeIn 0.5s ease forwards; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-.location-box h3 { font-size: 1.6rem; font-weight: 500; }
-.location-box .country { font-size: 0.85rem; color: rgba(255, 255, 255, 0.6); margin-top: 2px; }
-.main-info { margin: 15px 0; display: flex; flex-direction: column; align-items: center; }
-.weather-icon { width: 70px; height: 70px; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.15)); }
-#temperature { font-size: 3.3rem; font-weight: 300; }
-#description { font-size: 1.05rem; text-transform: capitalize; color: #00c6ff; }
+.search-box input::placeholder {
+    color: var(--text-muted);
+}
 
-.details-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 20px;
-}
-.detail-item { background: rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 12px; display: flex; flex-direction: column; gap: 4px; }
-.detail-item .label { font-size: 0.8rem; color: rgba(255, 255, 255, 0.5); }
-.detail-item .value { font-size: 1.1rem; font-weight: 500; }
+.search-button {
+    height: 100%;
+    padding: 0 23px;
 
-/* --- CỬA SỔ ĐĂNG NHẬP NỔI (MODAL) --- */
-.modal {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1000;
-}
-.modal-content {
-    background: #203a43; padding: 30px; border-radius: 15px; width: 320px;
-    text-align: center; position: relative; border: 1px solid rgba(255,255,255,0.1);
-}
-.close-btn { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; color: #aaa; }
-.modal-content input {
-    width: 100%; margin: 10px 0; padding: 12px; border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white;
-}
-.primary-btn {
-    width: 100%; padding: 12px; margin-top: 10px; border-radius: 8px; border: none;
-    background: linear-gradient(45deg, #00c6ff, #0072ff); color: white; font-weight: bold; cursor: pointer;
-}
-.switch-mode { margin-top: 15px; font-size: 0.85rem; }
-.switch-mode a { color: #00c6ff; text-decoration: none; font-weight: bold; }
+    color: #ffffff;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    border-radius: 15px;
 
-/* --- KHU VỰC LỊCH SỬ VÀ YÊU THÍCH --- */
+    font-weight: 700;
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        filter 0.2s ease;
+}
+
+.search-button:hover {
+    filter: brightness(1.08);
+    box-shadow: 0 10px 25px rgba(14, 165, 233, 0.28);
+    transform: translateY(-1px);
+}
+
+.search-button:active {
+    transform: scale(0.97);
+}
+
+.icon-button {
+    width: 52px;
+    height: 52px;
+    flex: 0 0 52px;
+
+    display: grid;
+    place-items: center;
+
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.075);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+
+    font-size: 1.4rem;
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.icon-button:hover {
+    background: rgba(56, 189, 248, 0.16);
+    border-color: rgba(56, 189, 248, 0.5);
+    transform: translateY(-2px);
+}
+
+
+/* ==================== TÀI KHOẢN ==================== */
+.user-panel {
+    min-width: max-content;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.account-button,
+.logout-button {
+    min-height: 44px;
+    padding: 0 16px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.075);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+
+    font-weight: 600;
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.account-button:hover {
+    background: rgba(56, 189, 248, 0.16);
+    border-color: rgba(56, 189, 248, 0.52);
+    transform: translateY(-1px);
+}
+
+.account-icon {
+    color: var(--primary-color);
+    font-size: 1.22rem;
+}
+
+.logged-in-view {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-information {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.user-avatar {
+    width: 39px;
+    height: 39px;
+
+    display: grid;
+    place-items: center;
+
+    color: var(--primary-color);
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.32);
+    border-radius: 50%;
+
+    font-size: 0.7rem;
+}
+
+.user-text {
+    max-width: 170px;
+    display: flex;
+    flex-direction: column;
+}
+
+.user-text small {
+    color: var(--text-muted);
+    font-size: 0.68rem;
+}
+
+.user-text strong {
+    overflow: hidden;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.logout-button {
+    min-height: 39px;
+    color: #fecaca;
+    background: rgba(239, 68, 68, 0.09);
+    border-color: rgba(239, 68, 68, 0.25);
+    font-size: 0.78rem;
+}
+
+.logout-button:hover {
+    background: rgba(239, 68, 68, 0.17);
+    border-color: rgba(239, 68, 68, 0.52);
+}
+
+
+/* ==================== THÔNG BÁO ==================== */
+.message-area {
+    width: min(calc(100% - 36px), var(--page-max-width));
+    margin: 16px auto 0;
+}
+
+.system-message {
+    padding: 14px 18px;
+    border-radius: var(--border-radius-small);
+    font-size: 0.9rem;
+    box-shadow: var(--shadow-small);
+}
+
+.warning-message {
+    color: #fde68a;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.38);
+}
+
+.error-message {
+    color: #fecaca;
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.38);
+}
+
+
+/* ==================== KHUNG ỨNG DỤNG ==================== */
+.weather-app {
+    width: min(calc(100% - 36px), var(--page-max-width));
+    margin: 24px auto 0;
+    padding-bottom: 52px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+
+/* ==================== KIỂU CHUNG CHO SECTION ==================== */
+.map-section,
+.weather-details-section,
+.forecast-section,
+.air-quality-section,
+.saved-data-card {
+    background: linear-gradient(
+        145deg,
+        rgba(13, 42, 69, 0.86),
+        rgba(6, 27, 48, 0.9)
+    );
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-large);
+    box-shadow: var(--shadow-medium);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+.section-eyebrow {
+    margin-bottom: 5px;
+    color: var(--primary-color);
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 1.8px;
+}
+
+.section-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 20px;
+}
+
+.section-title-row h2,
+.map-toolbar h1,
+.air-quality-main h2,
+.saved-data-header h2 {
+    font-size: clamp(1.15rem, 2vw, 1.55rem);
+    line-height: 1.25;
+}
+
+.updated-time {
+    color: var(--text-muted);
+    font-size: 0.77rem;
+}
+
+
+/* ==================== BẢN ĐỒ ==================== */
+.map-section {
+    padding: 20px;
+}
+
+.map-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 17px;
+}
+
+.map-actions,
+.forecast-scroll-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.small-action-button {
+    width: 40px;
+    height: 40px;
+
+    display: grid;
+    place-items: center;
+
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.075);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+
+    font-size: 1.25rem;
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.small-action-button:hover {
+    background: rgba(56, 189, 248, 0.17);
+    border-color: rgba(56, 189, 248, 0.48);
+    transform: translateY(-1px);
+}
+
+.map-wrapper {
+    position: relative;
+    width: 100%;
+    height: clamp(520px, 68vh, 760px);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    border-radius: 22px;
+    background: #082039;
+}
+
+.weather-map {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+}
+
+
+/* Leaflet */
+.leaflet-container {
+    background: #0c2841;
+    font-family: "Inter", sans-serif;
+}
+
+.leaflet-control-zoom,
+.leaflet-control-attribution {
+    border: none !important;
+    box-shadow: var(--shadow-small) !important;
+}
+
+.leaflet-control-zoom a {
+    color: #ffffff !important;
+    background: rgba(4, 25, 44, 0.92) !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.leaflet-control-attribution {
+    color: #a9bdd0 !important;
+    background: rgba(4, 25, 44, 0.84) !important;
+}
+
+.leaflet-control-attribution a {
+    color: #7dd3fc !important;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+    color: var(--text-primary);
+    background: rgba(6, 28, 49, 0.96);
+}
+
+.leaflet-popup-content-wrapper {
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+}
+
+
+/* ==================== THẺ THỜI TIẾT HIỆN TẠI ==================== */
+.current-weather-card {
+    position: absolute;
+    z-index: 500;
+    top: 26px;
+    left: 26px;
+
+    width: min(390px, calc(100% - 52px));
+    padding: 22px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(4, 25, 47, 0.94),
+            rgba(13, 56, 88, 0.9)
+        );
+    border: 1px solid rgba(180, 220, 255, 0.24);
+    border-radius: 23px;
+
+    box-shadow: var(--shadow-large);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+
+    animation: weatherCardAppear 0.45s ease;
+}
+
+@keyframes weatherCardAppear {
+    from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.weather-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.location-heading {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.location-pin {
+    margin-top: 7px;
+    color: var(--primary-color);
+    font-size: 0.72rem;
+}
+
+.location-box h2 {
+    font-size: 1.45rem;
+}
+
+.location-box > div p,
+#countryName {
+    margin-top: 2px;
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+}
+
+.local-time {
+    margin-top: 8px;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+}
+
+.favorite-button {
+    width: 41px;
+    height: 41px;
+    flex: 0 0 41px;
+
+    display: grid;
+    place-items: center;
+
+    color: var(--accent-color);
+    background: rgba(251, 191, 36, 0.1);
+    border: 1px solid rgba(251, 191, 36, 0.22);
+    border-radius: 13px;
+
+    font-size: 1.55rem;
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.favorite-button:hover {
+    background: rgba(251, 191, 36, 0.18);
+    transform: scale(1.08);
+}
+
+.temperature-area {
+    min-height: 145px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 22px 0;
+}
+
+.temperature-content {
+    display: flex;
+    align-items: center;
+    gap: 17px;
+}
+
+.temperature-value {
+    font-size: clamp(3.8rem, 7vw, 5.3rem);
+    font-weight: 700;
+    line-height: 0.9;
+    letter-spacing: -5px;
+}
+
+.weather-description {
+    max-width: 135px;
+    color: #dff4ff;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+.feels-like {
+    margin-top: 8px;
+    color: var(--text-muted);
+    font-size: 0.74rem;
+}
+
+.feels-like strong {
+    color: var(--text-secondary);
+}
+
+.weather-main-icon {
+    width: 92px;
+    height: 92px;
+    object-fit: contain;
+    filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.3));
+}
+
+.current-weather-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.metric-item {
+    min-width: 0;
+    padding: 12px;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    background: rgba(255, 255, 255, 0.065);
+    border: 1px solid rgba(255, 255, 255, 0.075);
+    border-radius: 14px;
+}
+
+.metric-icon {
+    width: 30px;
+    height: 30px;
+    flex: 0 0 30px;
+
+    display: grid;
+    place-items: center;
+
+    color: var(--primary-color);
+    background: rgba(56, 189, 248, 0.1);
+    border-radius: 9px;
+
+    font-size: 0.95rem;
+}
+
+.metric-item div {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.metric-item small {
+    color: var(--text-muted);
+    font-size: 0.66rem;
+}
+
+.metric-item strong {
+    overflow: hidden;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* ==================== LOADING ==================== */
+.loading-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 900;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+
+    color: var(--text-secondary);
+    background: rgba(2, 14, 26, 0.76);
+    backdrop-filter: blur(9px);
+    -webkit-backdrop-filter: blur(9px);
+}
+
+.loading-spinner {
+    width: 44px;
+    height: 44px;
+    border: 4px solid rgba(255, 255, 255, 0.14);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spinnerRotate 0.8s linear infinite;
+}
+
+@keyframes spinnerRotate {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* ==================== THÔNG TIN CHI TIẾT ==================== */
+.weather-details-section,
+.forecast-section {
+    padding: 23px;
+}
+
+.weather-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 13px;
+}
+
+.stat-card {
+    min-width: 0;
+    min-height: 128px;
+    padding: 15px;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    background: rgba(255, 255, 255, 0.055);
+    border: 1px solid rgba(255, 255, 255, 0.075);
+    border-radius: 17px;
+
+    transition:
+        transform 0.22s ease,
+        background 0.22s ease,
+        border-color 0.22s ease;
+}
+
+.stat-card:hover {
+    background: rgba(255, 255, 255, 0.085);
+    border-color: rgba(56, 189, 248, 0.28);
+    transform: translateY(-4px);
+}
+
+.stat-card-icon {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+
+    display: grid;
+    place-items: center;
+
+    color: var(--primary-color);
+    background: rgba(56, 189, 248, 0.1);
+    border-radius: 13px;
+
+    font-size: 1.25rem;
+}
+
+.stat-card > div:last-child {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-card small {
+    color: var(--text-muted);
+    font-size: 0.67rem;
+}
+
+.stat-card strong {
+    margin: 4px 0 2px;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.stat-card span {
+    overflow: hidden;
+    color: var(--text-secondary);
+    font-size: 0.66rem;
+    text-overflow: ellipsis;
+}
+
+
+/* ==================== DỰ BÁO THEO GIỜ ==================== */
+.hourly-forecast-list {
+    display: flex;
+    gap: 12px;
+
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    overscroll-behavior-inline: contain;
+
+    padding: 2px 2px 12px;
+}
+
+.hourly-card {
+    min-width: 125px;
+    min-height: 180px;
+    padding: 15px 12px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+
+    text-align: center;
+    background: rgba(255, 255, 255, 0.055);
+    border: 1px solid rgba(255, 255, 255, 0.075);
+    border-radius: 17px;
+
+    transition:
+        transform 0.22s ease,
+        background 0.22s ease,
+        border-color 0.22s ease;
+}
+
+.hourly-card:hover {
+    background: rgba(56, 189, 248, 0.11);
+    border-color: rgba(56, 189, 248, 0.32);
+    transform: translateY(-4px);
+}
+
+.hourly-card.current-hour {
+    background: linear-gradient(
+        145deg,
+        rgba(14, 165, 233, 0.22),
+        rgba(37, 99, 235, 0.17)
+    );
+    border-color: rgba(56, 189, 248, 0.48);
+}
+
+.hourly-time {
+    color: var(--text-secondary);
+    font-size: 0.76rem;
+    font-weight: 600;
+}
+
+.hourly-icon {
+    width: 54px;
+    height: 54px;
+    object-fit: contain;
+}
+
+.hourly-temperature {
+    font-size: 1.35rem;
+    font-weight: 800;
+}
+
+.hourly-condition {
+    width: 100%;
+    overflow: hidden;
+    color: var(--text-muted);
+    font-size: 0.68rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hourly-rain {
+    color: #7dd3fc;
+    font-size: 0.67rem;
+}
+
+
+/* ==================== DỰ BÁO 7 NGÀY ==================== */
+.daily-forecast-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.daily-card {
+    min-width: 0;
+    min-height: 215px;
+    padding: 16px 12px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+
+    text-align: center;
+    background: rgba(255, 255, 255, 0.055);
+    border: 1px solid rgba(255, 255, 255, 0.075);
+    border-radius: 18px;
+
+    transition:
+        background 0.22s ease,
+        border-color 0.22s ease,
+        transform 0.22s ease;
+}
+
+.daily-card:hover {
+    background: rgba(56, 189, 248, 0.11);
+    border-color: rgba(56, 189, 248, 0.33);
+    transform: translateY(-4px);
+}
+
+.daily-day {
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.daily-date {
+    color: var(--text-muted);
+    font-size: 0.68rem;
+}
+
+.daily-icon {
+    width: 62px;
+    height: 62px;
+    object-fit: contain;
+}
+
+.daily-condition {
+    width: 100%;
+    overflow: hidden;
+    color: var(--text-secondary);
+    font-size: 0.68rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.daily-temperature {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.daily-temperature strong {
+    font-size: 1.03rem;
+}
+
+.daily-temperature span {
+    color: var(--text-muted);
+    font-size: 0.84rem;
+}
+
+.daily-rain {
+    color: #7dd3fc;
+    font-size: 0.67rem;
+}
+
+
+/* ==================== PLACEHOLDER ==================== */
+.forecast-placeholder {
+    width: 100%;
+    min-height: 125px;
+    padding: 24px;
+
+    display: grid;
+    place-items: center;
+
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px dashed rgba(255, 255, 255, 0.13);
+    border-radius: 16px;
+
+    text-align: center;
+    font-size: 0.86rem;
+}
+
+
+/* ==================== CHẤT LƯỢNG KHÔNG KHÍ ==================== */
+.air-quality-section {
+    padding: 24px;
+}
+
+.air-quality-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    margin-bottom: 22px;
+}
+
+.air-description {
+    max-width: 650px;
+    margin-top: 10px;
+    color: var(--text-secondary);
+    font-size: 0.86rem;
+}
+
+.air-quality-score {
+    width: 110px;
+    height: 110px;
+    flex: 0 0 110px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.2), transparent 40%),
+        linear-gradient(145deg, rgba(34, 197, 94, 0.28), rgba(14, 165, 233, 0.16));
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    border-radius: 50%;
+
+    box-shadow: 0 18px 38px rgba(0, 0, 0, 0.24);
+}
+
+.air-quality-score span {
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+.air-quality-score small {
+    max-width: 90px;
+    color: var(--text-secondary);
+    font-size: 0.66rem;
+    text-align: center;
+}
+
+.air-pollutant-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 13px;
+}
+
+.pollutant-item {
+    padding: 17px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    background: rgba(255, 255, 255, 0.055);
+    border: 1px solid rgba(255, 255, 255, 0.075);
+    border-radius: 15px;
+}
+
+.pollutant-item small {
+    color: var(--text-muted);
+    font-weight: 700;
+}
+
+.pollutant-item strong {
+    font-size: 1rem;
+}
+
+
+/* ==================== DỮ LIỆU NGƯỜI DÙNG ==================== */
 .user-data-section {
-    margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1);
-    padding-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
 }
-.data-box h4 { font-size: 0.9rem; color: #00c6ff; margin-bottom: 8px; font-weight: 500; }
-.data-list { list-style: none; }
-.data-list li {
-    background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 8px;
-    margin-bottom: 6px; font-size: 0.85rem; cursor: pointer; transition: background 0.2s;
-    display: flex; justify-content: space-between; align-items: center;
-}
-.data-list li:hover { background: rgba(255,255,255,0.15); }
-.delete-item-btn { color: #ff4d4d; font-weight: bold; padding: 0 5px; cursor: pointer; font-size: 1.1rem; }
 
-/* --- RESPONSIVE CHO DI ĐỘNG --- */
-@media screen and (max-width: 520px) {
-    .user-panel { position: static; margin-bottom: 10px; width: 100%; text-align: center; }
-    .weather-container { margin-top: 10px; width: 100%; padding: 20px; }
-    .user-data-section { grid-template-columns: 1fr; }
+.saved-data-card {
+    min-width: 0;
+    padding: 22px;
+}
+
+.saved-data-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 17px;
+}
+
+.saved-data-icon {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+
+    display: grid;
+    place-items: center;
+
+    color: var(--accent-color);
+    background: rgba(251, 191, 36, 0.1);
+    border: 1px solid rgba(251, 191, 36, 0.2);
+    border-radius: 14px;
+
+    font-size: 1.15rem;
+}
+
+.data-list {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.data-list li {
+    min-width: 0;
+    min-height: 48px;
+    padding: 11px 13px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+
+    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 13px;
+
+    font-size: 0.82rem;
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.data-list li:not(.empty-list-message):hover {
+    background: rgba(56, 189, 248, 0.11);
+    border-color: rgba(56, 189, 248, 0.29);
+    transform: translateX(3px);
+}
+
+.data-list li span:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.delete-item-btn {
+    min-width: 27px;
+    min-height: 27px;
+
+    display: grid;
+    place-items: center;
+
+    color: #fca5a5;
+    background: rgba(239, 68, 68, 0.08);
+    border-radius: 8px;
+
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.delete-item-btn:hover {
+    color: #ffffff;
+    background: rgba(239, 68, 68, 0.72);
+}
+
+.empty-list-message {
+    justify-content: center !important;
+    color: var(--text-muted) !important;
+    border-style: dashed !important;
+    cursor: default !important;
+    text-align: center;
+}
+
+
+/* ==================== FOOTER ==================== */
+.page-footer {
+    width: min(calc(100% - 36px), var(--page-max-width));
+    margin: 0 auto;
+    padding: 26px 0 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    color: var(--text-muted);
+    border-top: 1px solid var(--border-color);
+
+    font-size: 0.76rem;
+}
+
+.page-footer strong {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.page-footer div p {
+    margin-top: 3px;
+}
+
+
+/* ==================== MODAL ĐĂNG NHẬP ==================== */
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+}
+
+.modal-backdrop {
+    position: absolute;
+    inset: 0;
+
+    background: rgba(1, 9, 18, 0.78);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.modal-content {
+    position: relative;
+    z-index: 2;
+
+    width: min(100%, 430px);
+    padding: 32px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(10, 40, 67, 0.98),
+            rgba(4, 22, 39, 0.98)
+        );
+    border: 1px solid var(--border-color-strong);
+    border-radius: 25px;
+
+    box-shadow: var(--shadow-large);
+    animation: modalAppear 0.3s ease;
+}
+
+@keyframes modalAppear {
+    from {
+        opacity: 0;
+        transform: translateY(15px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.close-modal-button {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+
+    width: 37px;
+    height: 37px;
+
+    display: grid;
+    place-items: center;
+
+    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.065);
+    border: 1px solid var(--border-color);
+    border-radius: 11px;
+
+    font-size: 1.35rem;
+    cursor: pointer;
+}
+
+.close-modal-button:hover {
+    color: #ffffff;
+    background: rgba(239, 68, 68, 0.16);
+    border-color: rgba(239, 68, 68, 0.4);
+}
+
+.auth-logo {
+    width: 62px;
+    height: 62px;
+
+    display: grid;
+    place-items: center;
+
+    margin: 0 auto 18px;
+
+    color: #ffffff;
+    background: linear-gradient(145deg, var(--primary-color), #2563eb);
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    border-radius: 19px;
+
+    font-size: 2rem;
+    box-shadow: 0 16px 35px rgba(14, 165, 233, 0.28);
+}
+
+.auth-heading {
+    margin-bottom: 22px;
+    text-align: center;
+}
+
+.auth-heading h2 {
+    font-size: 1.55rem;
+}
+
+.auth-heading p {
+    margin-top: 7px;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.auth-form label {
+    margin: 11px 0 7px;
+    color: var(--text-secondary);
+    font-size: 0.76rem;
+    font-weight: 600;
+}
+
+.auth-form input {
+    width: 100%;
+    height: 49px;
+    padding: 0 14px;
+
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.065);
+    border: 1px solid var(--border-color);
+    border-radius: 13px;
+    outline: none;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.auth-form input:focus {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(56, 189, 248, 0.58);
+    box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.09);
+}
+
+.auth-form input::placeholder {
+    color: var(--text-muted);
+}
+
+.auth-error {
+    margin-top: 12px;
+    padding: 10px 12px;
+
+    color: #fecaca;
+    background: rgba(239, 68, 68, 0.11);
+    border: 1px solid rgba(239, 68, 68, 0.27);
+    border-radius: 10px;
+
+    font-size: 0.75rem;
+}
+
+.primary-auth-button {
+    width: 100%;
+    min-height: 49px;
+    margin-top: 18px;
+
+    color: #ffffff;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    border-radius: 13px;
+
+    font-weight: 800;
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        filter 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.primary-auth-button:hover {
+    filter: brightness(1.08);
+    box-shadow: 0 12px 30px rgba(14, 165, 233, 0.25);
+    transform: translateY(-1px);
+}
+
+.switch-mode {
+    margin-top: 18px;
+    color: var(--text-secondary);
+    font-size: 0.77rem;
+    text-align: center;
+}
+
+.switch-mode a {
+    margin-left: 3px;
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.switch-mode a:hover {
+    text-decoration: underline;
+}
+
+
+/* ==================== THÔNG BÁO TOAST ==================== */
+.toast-message {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 4000;
+
+    max-width: min(360px, calc(100vw - 32px));
+    min-height: 50px;
+    padding: 12px 17px;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    color: var(--text-primary);
+    background: rgba(6, 32, 54, 0.96);
+    border: 1px solid rgba(56, 189, 248, 0.32);
+    border-radius: 14px;
+
+    box-shadow: var(--shadow-medium);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+
+    font-size: 0.8rem;
+    animation: toastAppear 0.3s ease;
+}
+
+.toast-message #toastIcon {
+    width: 27px;
+    height: 27px;
+    flex: 0 0 27px;
+
+    display: grid;
+    place-items: center;
+
+    color: #bbf7d0;
+    background: rgba(34, 197, 94, 0.16);
+    border-radius: 8px;
+}
+
+@keyframes toastAppear {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+/* ==================== MÀN HÌNH LAPTOP NHỎ ==================== */
+@media screen and (max-width: 1280px) {
+    .top-header {
+        grid-template-columns: auto minmax(260px, 1fr) auto;
+        gap: 16px;
+        padding-inline: 20px;
+    }
+
+    .brand-text small {
+        display: none;
+    }
+
+    .weather-stat-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .daily-forecast-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .user-text {
+        display: none;
+    }
+}
+
+
+/* ==================== TABLET NGANG ==================== */
+@media screen and (max-width: 1024px) {
+    :root {
+        --header-height: auto;
+    }
+
+    .top-header {
+        position: relative;
+        grid-template-columns: 1fr auto;
+        gap: 14px;
+        padding: 15px 18px;
+    }
+
+    .brand {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    .user-panel {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .header-search {
+        grid-column: 1 / -1;
+        grid-row: 2;
+    }
+
+    .map-wrapper {
+        height: 620px;
+    }
+
+    .current-weather-card {
+        top: 20px;
+        left: 20px;
+        width: min(370px, calc(100% - 40px));
+    }
+
+    .daily-forecast-grid {
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+
+    .daily-card {
+        min-width: 150px;
+    }
+
+    .air-pollutant-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+
+/* ==================== TABLET DỌC ==================== */
+@media screen and (max-width: 768px) {
+    .weather-app,
+    .message-area,
+    .page-footer {
+        width: min(calc(100% - 24px), var(--page-max-width));
+    }
+
+    .top-header {
+        padding: 13px 12px;
+    }
+
+    .brand-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 13px;
+        font-size: 1.35rem;
+    }
+
+    .brand-text strong {
+        font-size: 0.98rem;
+    }
+
+    .account-button {
+        padding: 0 12px;
+    }
+
+    .map-section,
+    .weather-details-section,
+    .forecast-section,
+    .air-quality-section,
+    .saved-data-card {
+        border-radius: 20px;
+    }
+
+    .map-section {
+        padding: 14px;
+    }
+
+    .map-toolbar {
+        align-items: flex-end;
+    }
+
+    .map-wrapper {
+        height: auto;
+        min-height: 720px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        overflow: visible;
+        background: transparent;
+        border: none;
+        border-radius: 0;
+    }
+
+    .weather-map {
+        position: relative;
+        inset: auto;
+        order: 2;
+
+        width: 100%;
+        height: 410px;
+
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        border-radius: 18px;
+    }
+
+    .current-weather-card {
+        position: relative;
+        top: auto;
+        left: auto;
+        order: 1;
+
+        width: 100%;
+        max-width: none;
+
+        border-radius: 18px;
+    }
+
+    .loading-overlay {
+        position: fixed;
+        z-index: 5000;
+    }
+
+    .weather-stat-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .stat-card {
+        min-height: 110px;
+    }
+
+    .user-data-section {
+        grid-template-columns: 1fr;
+    }
+
+    .air-quality-main {
+        align-items: flex-start;
+    }
+
+    .page-footer {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+
+/* ==================== SMARTPHONE ==================== */
+@media screen and (max-width: 560px) {
+    body {
+        background:
+            radial-gradient(circle at top left, rgba(14, 165, 233, 0.13), transparent 34%),
+            linear-gradient(145deg, #04101d, #081d31);
+    }
+
+    .top-header {
+        grid-template-columns: 1fr auto;
+    }
+
+    .brand-text small {
+        display: none;
+    }
+
+    .brand-icon {
+        width: 39px;
+        height: 39px;
+    }
+
+    .brand-text strong {
+        font-size: 0.9rem;
+    }
+
+    .account-button span:last-child {
+        display: none;
+    }
+
+    .account-button {
+        width: 42px;
+        min-height: 42px;
+        padding: 0;
+    }
+
+    .header-search {
+        align-items: stretch;
+    }
+
+    .search-box {
+        height: 48px;
+        padding-left: 12px;
+        border-radius: 14px;
+    }
+
+    .search-icon {
+        display: none;
+    }
+
+    .search-box input {
+        font-size: 0.84rem;
+    }
+
+    .search-button {
+        padding: 0 14px;
+        border-radius: 12px;
+        font-size: 0.78rem;
+    }
+
+    .icon-button {
+        width: 48px;
+        height: 48px;
+        flex-basis: 48px;
+        border-radius: 14px;
+    }
+
+    .weather-app {
+        margin-top: 16px;
+        gap: 16px;
+    }
+
+    .map-toolbar {
+        align-items: flex-start;
+    }
+
+    .map-actions {
+        display: none;
+    }
+
+    .map-toolbar h1 {
+        font-size: 1.12rem;
+    }
+
+    .map-wrapper {
+        min-height: 690px;
+    }
+
+    .weather-map {
+        height: 360px;
+    }
+
+    .current-weather-card {
+        padding: 17px;
+    }
+
+    .temperature-area {
+        min-height: 120px;
+        margin: 17px 0;
+    }
+
+    .temperature-content {
+        gap: 11px;
+    }
+
+    .temperature-value {
+        font-size: 3.55rem;
+        letter-spacing: -4px;
+    }
+
+    .weather-description {
+        max-width: 100px;
+        font-size: 0.86rem;
+    }
+
+    .weather-main-icon {
+        width: 73px;
+        height: 73px;
+    }
+
+    .current-weather-metrics {
+        gap: 8px;
+    }
+
+    .metric-item {
+        padding: 10px;
+        gap: 8px;
+    }
+
+    .metric-icon {
+        width: 27px;
+        height: 27px;
+        flex-basis: 27px;
+        font-size: 0.8rem;
+    }
+
+    .metric-item strong {
+        font-size: 0.77rem;
+    }
+
+    .weather-details-section,
+    .forecast-section,
+    .air-quality-section,
+    .saved-data-card {
+        padding: 17px;
+    }
+
+    .section-title-row {
+        align-items: flex-start;
+        margin-bottom: 16px;
+    }
+
+    .updated-time {
+        max-width: 110px;
+        text-align: right;
+    }
+
+    .weather-stat-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card {
+        min-height: 85px;
+    }
+
+    .hourly-card {
+        min-width: 108px;
+        min-height: 165px;
+    }
+
+    .daily-card {
+        min-width: 137px;
+        min-height: 200px;
+    }
+
+    .air-quality-main {
+        flex-direction: column;
+    }
+
+    .air-quality-score {
+        align-self: center;
+    }
+
+    .air-pollutant-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .pollutant-item {
+        padding: 13px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .modal-content {
+        padding: 27px 20px 22px;
+        border-radius: 21px;
+    }
+
+    .toast-message {
+        right: 16px;
+        bottom: 16px;
+        left: 16px;
+        max-width: none;
+    }
+}
+
+
+/* ==================== SMARTPHONE RẤT NHỎ ==================== */
+@media screen and (max-width: 390px) {
+    .weather-app,
+    .message-area,
+    .page-footer {
+        width: calc(100% - 18px);
+    }
+
+    .top-header {
+        padding-inline: 9px;
+    }
+
+    .brand-text strong {
+        font-size: 0.83rem;
+    }
+
+    .search-button {
+        padding-inline: 11px;
+    }
+
+    .temperature-value {
+        font-size: 3.2rem;
+    }
+
+    .weather-main-icon {
+        width: 64px;
+        height: 64px;
+    }
+
+    .metric-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .air-pollutant-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* ==================== GIẢM CHUYỂN ĐỘNG ==================== */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }

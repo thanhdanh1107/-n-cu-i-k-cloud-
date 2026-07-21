@@ -2,87 +2,737 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ứng Dụng Dự Báo Thời Tiết</title>
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Website tra cứu thời tiết theo thành phố, dự báo theo giờ, dự báo 7 ngày và bản đồ trực quan."
+    >
+
+    <meta name="theme-color" content="#071426">
+
+    <title>SkyWeather - Tra cứu thời tiết</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Leaflet Map -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
+    <!-- CSS chính -->
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
+
 <body>
 
-    <div class="user-panel">
-        <div id="loggedOutView" class="hidden">
-            <button id="showAuthBtn" class="auth-btn">Đăng nhập / Đăng ký</button>
-        </div>
-        <div id="loggedInView" class="hidden">
-            <span>Xin chào, <b id="userEmailDisplay"></b></span>
-            <button id="logoutBtn" class="auth-btn outline">Đăng xuất</button>
-        </div>
+    <!-- ==================== NỀN TRANG ==================== -->
+    <div class="page-background" aria-hidden="true">
+        <div class="background-glow glow-one"></div>
+        <div class="background-glow glow-two"></div>
+        <div class="background-grid"></div>
     </div>
 
-    <div id="authModal" class="modal">
-        <div class="modal-content">
-            <h3 id="authTitle">Đăng Nhập</h3>
-            <input type="email" id="emailInput" placeholder="Email của bạn">
-            <input type="password" id="passwordInput" placeholder="Mật khẩu (tối thiểu 6 ký tự)">
-            <p id="authError" class="error-text hidden"></p>
-            <button id="submitAuthBtn" class="primary-btn">Đăng Nhập</button>
-            <p class="switch-mode">
-                <span id="authSwitchText">Chưa có tài khoản?</span> 
-                <a href="#" id="switchAuthMode">Đăng ký ngay</a>
+
+    <!-- ==================== HEADER ==================== -->
+    <header class="top-header">
+
+        <a href="#" class="brand" aria-label="Trang chủ SkyWeather">
+            <span class="brand-icon" aria-hidden="true">☁</span>
+
+            <span class="brand-text">
+                <strong>SkyWeather</strong>
+                <small>Thời tiết trực tuyến</small>
+            </span>
+        </a>
+
+
+        <!-- Thanh tìm kiếm -->
+        <div class="header-search">
+
+            <div class="search-box">
+                <span class="search-icon" aria-hidden="true">⌕</span>
+
+                <input
+                    type="text"
+                    id="cityInput"
+                    placeholder="Nhập tên thành phố..."
+                    autocomplete="off"
+                    aria-label="Nhập tên thành phố"
+                >
+
+                <button
+                    type="button"
+                    id="searchBtn"
+                    class="search-button"
+                    aria-label="Tìm kiếm thời tiết"
+                >
+                    Tìm kiếm
+                </button>
+            </div>
+
+            <button
+                type="button"
+                id="locationBtn"
+                class="icon-button location-button"
+                title="Sử dụng vị trí hiện tại"
+                aria-label="Sử dụng vị trí hiện tại"
+            >
+                <span aria-hidden="true">⌖</span>
+            </button>
+        </div>
+
+
+        <!-- Khu vực tài khoản -->
+        <div class="user-panel">
+
+            <div id="loggedOutView">
+                <button
+                    type="button"
+                    id="showAuthBtn"
+                    class="account-button"
+                >
+                    <span class="account-icon" aria-hidden="true">♙</span>
+                    <span>Đăng nhập</span>
+                </button>
+            </div>
+
+            <div id="loggedInView" class="logged-in-view hidden">
+
+                <div class="user-information">
+                    <span class="user-avatar" aria-hidden="true">●</span>
+
+                    <div class="user-text">
+                        <small>Xin chào</small>
+                        <strong id="userEmailDisplay">Người dùng</strong>
+                    </div>
+                </div>
+
+                <button
+                    type="button"
+                    id="logoutBtn"
+                    class="logout-button"
+                >
+                    Đăng xuất
+                </button>
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- ==================== THÔNG BÁO LỖI ==================== -->
+    <section class="message-area" aria-live="polite">
+
+        <p
+            id="validationMessage"
+            class="system-message warning-message hidden"
+        ></p>
+
+        <p
+            id="errorMessage"
+            class="system-message error-message hidden"
+        >
+            Không tìm thấy thành phố. Vui lòng kiểm tra lại tên địa điểm.
+        </p>
+
+    </section>
+
+
+    <!-- ==================== ỨNG DỤNG CHÍNH ==================== -->
+    <main id="mainApp" class="weather-app">
+
+        <!-- ==================== BẢN ĐỒ ==================== -->
+        <section class="map-section">
+
+            <div class="map-toolbar">
+
+                <div>
+                    <p class="section-eyebrow">BẢN ĐỒ THỜI TIẾT</p>
+                    <h1>Theo dõi thời tiết theo thành phố</h1>
+                </div>
+
+                <div class="map-actions">
+
+                    <button
+                        type="button"
+                        id="mapZoomOutBtn"
+                        class="small-action-button"
+                        title="Thu nhỏ bản đồ"
+                    >
+                        −
+                    </button>
+
+                    <button
+                        type="button"
+                        id="mapResetBtn"
+                        class="small-action-button"
+                        title="Đặt lại bản đồ"
+                    >
+                        ◎
+                    </button>
+
+                    <button
+                        type="button"
+                        id="mapZoomInBtn"
+                        class="small-action-button"
+                        title="Phóng to bản đồ"
+                    >
+                        +
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="map-wrapper">
+
+                <!-- Leaflet sẽ hiển thị bản đồ tại đây -->
+                <div
+                    id="weatherMap"
+                    class="weather-map"
+                    aria-label="Bản đồ vị trí thời tiết"
+                ></div>
+
+
+                <!-- Thẻ thời tiết hiện tại -->
+                <article
+                    id="weatherResult"
+                    class="current-weather-card hidden"
+                >
+
+                    <div class="weather-card-header">
+
+                        <div class="location-box">
+
+                            <div class="location-heading">
+                                <span class="location-pin" aria-hidden="true">●</span>
+
+                                <div>
+                                    <h2 id="cityName">--</h2>
+                                    <p id="countryName">--</p>
+                                </div>
+                            </div>
+
+                            <p id="localTime" class="local-time">
+                                Thời gian địa phương: --
+                            </p>
+
+                        </div>
+
+                        <button
+                            type="button"
+                            id="favBtn"
+                            class="favorite-button"
+                            title="Thêm vào danh sách yêu thích"
+                            aria-label="Thêm vào danh sách yêu thích"
+                        >
+                            ☆
+                        </button>
+
+                    </div>
+
+
+                    <div class="temperature-area">
+
+                        <div class="temperature-content">
+                            <p id="temperature" class="temperature-value">--°</p>
+
+                            <div>
+                                <p id="description" class="weather-description">
+                                    Chưa có dữ liệu
+                                </p>
+
+                                <p class="feels-like">
+                                    Cảm giác như
+                                    <strong id="feelsLike">--°C</strong>
+                                </p>
+                            </div>
+                        </div>
+
+                        <img
+                            id="weatherIcon"
+                            class="weather-main-icon hidden"
+                            src=""
+                            alt="Biểu tượng thời tiết"
+                        >
+
+                    </div>
+
+
+                    <div class="current-weather-metrics">
+
+                        <div class="metric-item">
+                            <span class="metric-icon" aria-hidden="true">💧</span>
+
+                            <div>
+                                <small>Độ ẩm</small>
+                                <strong id="humidity">--%</strong>
+                            </div>
+                        </div>
+
+
+                        <div class="metric-item">
+                            <span class="metric-icon" aria-hidden="true">〰</span>
+
+                            <div>
+                                <small>Sức gió</small>
+                                <strong id="wind">-- km/h</strong>
+                            </div>
+                        </div>
+
+
+                        <div class="metric-item">
+                            <span class="metric-icon" aria-hidden="true">◉</span>
+
+                            <div>
+                                <small>Áp suất</small>
+                                <strong id="pressure">-- hPa</strong>
+                            </div>
+                        </div>
+
+
+                        <div class="metric-item">
+                            <span class="metric-icon" aria-hidden="true">◌</span>
+
+                            <div>
+                                <small>Tầm nhìn</small>
+                                <strong id="visibility">-- km</strong>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </article>
+
+
+                <!-- Trạng thái đang tải -->
+                <div id="loadingOverlay" class="loading-overlay hidden">
+
+                    <div class="loading-spinner"></div>
+
+                    <p>Đang tải dữ liệu thời tiết...</p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==================== THÔNG TIN CHI TIẾT ==================== -->
+        <section class="weather-details-section">
+
+            <div class="section-title-row">
+                <div>
+                    <p class="section-eyebrow">THÔNG TIN HIỆN TẠI</p>
+                    <h2>Chi tiết thời tiết</h2>
+                </div>
+
+                <span id="weatherUpdatedTime" class="updated-time">
+                    Cập nhật: --
+                </span>
+            </div>
+
+
+            <div class="weather-stat-grid">
+
+                <article class="stat-card">
+                    <div class="stat-card-icon">☀</div>
+
+                    <div>
+                        <small>Chỉ số UV</small>
+                        <strong id="uvIndex">--</strong>
+                        <span id="uvStatus">Chưa có dữ liệu</span>
+                    </div>
+                </article>
+
+
+                <article class="stat-card">
+                    <div class="stat-card-icon">☂</div>
+
+                    <div>
+                        <small>Lượng mưa</small>
+                        <strong id="precipitation">-- mm</strong>
+                        <span>Trong thời điểm hiện tại</span>
+                    </div>
+                </article>
+
+
+                <article class="stat-card">
+                    <div class="stat-card-icon">↗</div>
+
+                    <div>
+                        <small>Hướng gió</small>
+                        <strong id="windDirection">--</strong>
+                        <span id="windDegree">--°</span>
+                    </div>
+                </article>
+
+
+                <article class="stat-card">
+                    <div class="stat-card-icon">☁</div>
+
+                    <div>
+                        <small>Mây che phủ</small>
+                        <strong id="cloudCover">--%</strong>
+                        <span>Mức độ bao phủ bầu trời</span>
+                    </div>
+                </article>
+
+
+                <article class="stat-card">
+                    <div class="stat-card-icon">🌅</div>
+
+                    <div>
+                        <small>Bình minh</small>
+                        <strong id="sunrise">--:--</strong>
+                        <span>Giờ địa phương</span>
+                    </div>
+                </article>
+
+
+                <article class="stat-card">
+                    <div class="stat-card-icon">🌇</div>
+
+                    <div>
+                        <small>Hoàng hôn</small>
+                        <strong id="sunset">--:--</strong>
+                        <span>Giờ địa phương</span>
+                    </div>
+                </article>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==================== DỰ BÁO THEO GIỜ ==================== -->
+        <section class="forecast-section">
+
+            <div class="section-title-row">
+
+                <div>
+                    <p class="section-eyebrow">DỰ BÁO NGẮN HẠN</p>
+                    <h2>Dự báo theo giờ</h2>
+                </div>
+
+                <div class="forecast-scroll-actions">
+                    <button
+                        type="button"
+                        id="hourlyPrevBtn"
+                        class="small-action-button"
+                        aria-label="Xem giờ trước"
+                    >
+                        ‹
+                    </button>
+
+                    <button
+                        type="button"
+                        id="hourlyNextBtn"
+                        class="small-action-button"
+                        aria-label="Xem giờ tiếp theo"
+                    >
+                        ›
+                    </button>
+                </div>
+
+            </div>
+
+
+            <div
+                id="hourlyForecast"
+                class="hourly-forecast-list"
+                aria-label="Danh sách dự báo theo giờ"
+            >
+
+                <div class="forecast-placeholder">
+                    Hãy tìm kiếm một thành phố để xem dự báo theo giờ.
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==================== DỰ BÁO NHIỀU NGÀY ==================== -->
+        <section class="forecast-section">
+
+            <div class="section-title-row">
+
+                <div>
+                    <p class="section-eyebrow">DỰ BÁO DÀI HẠN</p>
+                    <h2>Dự báo 7 ngày tới</h2>
+                </div>
+
+            </div>
+
+
+            <div
+                id="dailyForecast"
+                class="daily-forecast-grid"
+                aria-label="Dự báo thời tiết 7 ngày"
+            >
+
+                <div class="forecast-placeholder">
+                    Dữ liệu dự báo nhiều ngày sẽ hiển thị tại đây.
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==================== CHẤT LƯỢNG KHÔNG KHÍ ==================== -->
+        <section class="air-quality-section">
+
+            <div class="air-quality-main">
+
+                <div>
+                    <p class="section-eyebrow">CHẤT LƯỢNG KHÔNG KHÍ</p>
+                    <h2>Chỉ số không khí hiện tại</h2>
+
+                    <p id="airQualityDescription" class="air-description">
+                        Chưa có dữ liệu chất lượng không khí.
+                    </p>
+                </div>
+
+
+                <div class="air-quality-score">
+
+                    <span id="airQualityValue">--</span>
+
+                    <small id="airQualityStatus">Chưa xác định</small>
+
+                </div>
+
+            </div>
+
+
+            <div class="air-pollutant-grid">
+
+                <div class="pollutant-item">
+                    <small>PM2.5</small>
+                    <strong id="pm25">--</strong>
+                </div>
+
+                <div class="pollutant-item">
+                    <small>PM10</small>
+                    <strong id="pm10">--</strong>
+                </div>
+
+                <div class="pollutant-item">
+                    <small>CO</small>
+                    <strong id="carbonMonoxide">--</strong>
+                </div>
+
+                <div class="pollutant-item">
+                    <small>NO₂</small>
+                    <strong id="nitrogenDioxide">--</strong>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==================== DỮ LIỆU NGƯỜI DÙNG ==================== -->
+        <section id="userDataSection" class="user-data-section">
+
+            <article class="saved-data-card">
+
+                <div class="saved-data-header">
+                    <div>
+                        <p class="section-eyebrow">ĐỊA ĐIỂM ĐÃ LƯU</p>
+                        <h2>Thành phố yêu thích</h2>
+                    </div>
+
+                    <span class="saved-data-icon" aria-hidden="true">★</span>
+                </div>
+
+
+                <ul
+                    id="favoritesList"
+                    class="data-list"
+                    aria-label="Danh sách thành phố yêu thích"
+                >
+                    <li class="empty-list-message">
+                        Đăng nhập để lưu thành phố yêu thích.
+                    </li>
+                </ul>
+
+            </article>
+
+
+            <article class="saved-data-card">
+
+                <div class="saved-data-header">
+                    <div>
+                        <p class="section-eyebrow">HOẠT ĐỘNG GẦN ĐÂY</p>
+                        <h2>Lịch sử tìm kiếm</h2>
+                    </div>
+
+                    <span class="saved-data-icon" aria-hidden="true">◷</span>
+                </div>
+
+
+                <ul
+                    id="historyList"
+                    class="data-list"
+                    aria-label="Lịch sử tìm kiếm thành phố"
+                >
+                    <li class="empty-list-message">
+                        Chưa có lịch sử tìm kiếm.
+                    </li>
+                </ul>
+
+            </article>
+
+        </section>
+
+    </main>
+
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="page-footer">
+
+        <div>
+            <strong>SkyWeather</strong>
+
+            <p>
+                Đồ án môn Điện toán đám mây – Website xem thời tiết theo thành phố.
             </p>
         </div>
+
+        <p>
+            Dữ liệu thời tiết được cung cấp bởi WeatherAPI.
+        </p>
+
+    </footer>
+
+
+    <!-- ==================== MODAL ĐĂNG NHẬP ==================== -->
+    <div
+        id="authModal"
+        class="modal hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="authTitle"
+    >
+
+        <div class="modal-backdrop" id="authModalBackdrop"></div>
+
+
+        <div class="modal-content">
+
+            <button
+                type="button"
+                id="closeAuthBtn"
+                class="close-modal-button"
+                aria-label="Đóng cửa sổ đăng nhập"
+            >
+                ×
+            </button>
+
+
+            <div class="auth-logo">
+                <span aria-hidden="true">☁</span>
+            </div>
+
+
+            <div class="auth-heading">
+                <h2 id="authTitle">Đăng nhập</h2>
+
+                <p>
+                    Đăng nhập để đồng bộ thành phố yêu thích và lịch sử tìm kiếm.
+                </p>
+            </div>
+
+
+            <div class="auth-form">
+
+                <label for="emailInput">Địa chỉ email</label>
+
+                <input
+                    type="email"
+                    id="emailInput"
+                    placeholder="example@email.com"
+                    autocomplete="email"
+                >
+
+
+                <label for="passwordInput">Mật khẩu</label>
+
+                <input
+                    type="password"
+                    id="passwordInput"
+                    placeholder="Tối thiểu 6 ký tự"
+                    autocomplete="current-password"
+                >
+
+
+                <p
+                    id="authError"
+                    class="auth-error hidden"
+                    aria-live="polite"
+                ></p>
+
+
+                <button
+                    type="button"
+                    id="submitAuthBtn"
+                    class="primary-auth-button"
+                >
+                    Đăng nhập
+                </button>
+
+            </div>
+
+
+            <p class="switch-mode">
+                <span id="authSwitchText">Chưa có tài khoản?</span>
+
+                <a href="#" id="switchAuthMode">
+                    Đăng ký ngay
+                </a>
+            </p>
+
+        </div>
+
     </div>
 
-    <div id="mainApp" class="weather-container hidden">
-        <h2 class="app-title">Dự Báo Thời Tiết</h2>
-        
-        <div class="search-box">
-            <input type="text" id="cityInput" placeholder="Nhập tên thành phố (vd: Hanoi...)" autocomplete="off">
-            <button id="searchBtn">Tìm kiếm</button>
-        </div>
-        
-        <p id="validationMessage" class="error-text hidden"></p>
-        <p id="errorMessage" class="error-text hidden">Không tìm thấy thành phố này. Vui lòng kiểm tra lại!</p>
 
-        <div id="weatherResult" class="weather-card hidden">
-            <div class="location-box">
-                <div class="title-wrapper">
-                    <h3 id="cityName">--</h3>
-                    <button id="favBtn" class="fav-btn">☆</button>
-                </div>
-                <p id="countryName" class="country">--</p>
-            </div>
-            
-            <div class="main-info">
-                <img id="weatherIcon" src="" alt="Thời tiết" class="weather-icon hidden">
-                <h1 id="temperature">--°C</h1>
-                <p id="description">--</p>
-            </div>
-            
-            <div class="details-grid">
-                <div class="detail-item">
-                    <span class="label">Độ ẩm</span>
-                    <span id="humidity" class="value">--%</span>
-                </div>
-                <div class="detail-item">
-                    <span class="label">Sức gió</span>
-                    <span id="wind" class="value">-- km/h</span>
-                </div>
-            </div>
-        </div>
-
-        <div id="userDataSection" class="user-data-section hidden">
-            <div class="data-box">
-                <h4>⭐ Thành phố yêu thích</h4>
-                <ul id="favoritesList" class="data-list"></ul>
-            </div>
-            <div class="data-box">
-                <h4>🕒 Tìm kiếm gần đây</h4>
-                <ul id="historyList" class="data-list"></ul>
-            </div>
-        </div>
+    <!-- ==================== THÔNG BÁO NHỎ ==================== -->
+    <div
+        id="toastMessage"
+        class="toast-message hidden"
+        role="status"
+        aria-live="polite"
+    >
+        <span id="toastIcon">✓</span>
+        <span id="toastText">Thao tác thành công.</span>
     </div>
 
+
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- JavaScript chính -->
     <script type="module" src="script.js"></script>
+
 </body>
 </html>
